@@ -1,6 +1,5 @@
 local createdPrompts = {}
 local Hangings = {}
-local ped = PlayerPedId()
 
 local HangPrompt
 function SetupHangPrompt()
@@ -24,9 +23,10 @@ Citizen.CreateThread(function()
     local prompt, interacting = false, false 
     local lastPrompt = false
     while true do
-        ped = PlayerPedId()
+        local ped = PlayerPedId()
         local waitingTime = 800
-        local sId = GetServerId(ped)
+        
+        local sId = PlayerPedId()--GetServerId(ped)
         for k,v in ipairs(Config.Hanging.Locations) do
             if (not Hangings[k]) then
                 TriggerServerEvent("kr_hanging:addHangRope", k)
@@ -130,10 +130,10 @@ AddEventHandler("kr_hanging:getHangInfo", function(i)
 end)
 RegisterNetEvent("kr_hanging:releaseHangingPlayer")
 AddEventHandler("kr_hanging:releaseHangingPlayer", function()
-    local sId = GetServerId(ped)
+    local sId = PlayerPedId()--GetServerId(ped)
     for k,v in pairs(Hangings) do
         if (v.hPlayers["pId"] ~= nil and v.hPlayers["pId"] == sId) then
-            local ped = ped
+            local ped = PlayerPedId()
             local rope = v.hPlayers["rId"]
             local knot = NetToObj(v.hPlayers["kId"])
             DetachEntity(knot)
@@ -146,7 +146,8 @@ AddEventHandler("kr_hanging:releaseHangingPlayer", function()
 end)
 RegisterNetEvent("kr_hanging:letTheHangingBegin")
 AddEventHandler("kr_hanging:letTheHangingBegin", function(i)
-    local sId = GetServerId(ped)
+    local sId = PlayerPedId()--GetServerId(ped)
+    local ped = PlayerPedId()
     if (Hangings[i].hPlayers ~= nil and Hangings[i].hPlayers["pId"] ~= nil) then
         if (Hangings[i].hPlayers["pId"] == sId and Hangings[i].tDoorOpen) then
             Citizen.Wait(3300)
@@ -176,14 +177,14 @@ function reqAnimDict(model)
         Citizen.Wait(5)
     end
 end
-
+--[[
 function GetServerId(ped)
     for i=0, 255 do
         if (GetPlayerPed(i) == ped and NetworkIsPlayerActive(i)) then
             return GetPlayerServerId(i)
         end
     end
-end
+end]]
 
 AddEventHandler('onResourceStop', function(name)
     if name == GetCurrentResourceName() then  
